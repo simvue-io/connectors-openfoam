@@ -11,7 +11,7 @@
 </p>
 
 <p align="center">
-This is a template repository which allows you to quickly create new Connectors which provide Simvue tracking and monitoring functionality to Non-Python simulations.
+Allow easy connection between Simvue and OpenFOAM, allowing for easy tracking and monitoring of CFD simulations in real time.
 </p>
 
 <div align="center">
@@ -25,65 +25,17 @@ This is a template repository which allows you to quickly create new Connectors 
   <a href="https://docs.simvue.io"><b>Documentation</b></a>
 </h3>
 
-## How to use this template
-
-### Naming your connector
-First, make a name for your new connector. Typically, the module name is of the form `simvue-{software_name}`, and the connector class itself is of the form `{SoftwareName}Run`. Update the `pyproject.toml` file with the name of your module, and also update the directory currently called `simvue_template` with your module name.
-
-### Creating the code
-Your connector class should be made in the `connector.py` file inside your module, with any extra functionality which it needs to work (but you don't want inside the class itself) put in files inside the `extras` directory. The connector should inherit from the `WrappedRun` class provided by the `simvue-connector` module, and should use `multiparser` to track and parse output files as they are being written. See an example in the [connectors-generic repository](https://github.com/simvue-io/connectors-generic), or check out any of our premade connectors for ideas:
-
-* [FDS](https://github.com/simvue-io/connectors-fds)
-
-Also look at the `CONTRIBUTING.md` file for expected coding standards.
-
-
-### Writing examples
-In the `examples` directory, please provide at least one example of your connector being used to track your simulation software. Create this example inside a function so that it can be used in the integration tests. If your software is difficult to install, you may want to provide setup instructions for using a Docker container or similar, as well as instructions assuming that the software is already installed on the user's system.
-
-### Writing tests
-You should create two types of tests:
-
-* Unit tests: Check each element of your connector independently, such as file parsers and callbacks, each method etc. You should use `pytest`, and use Mockers to mock out any functionality which your simulation software would typically provide so that the simulation software itself is **not** required to run these tests.
-* Integration tests: These check the end-to-end functionality of your connector when used with the actual simulation software. You should parametrize the test to include offline mode, as well as online. You can use the example(s) which you created earlier as the basis for these tests.
-
-### CI Workflows
-Inside the `.github` directory, there are a number of workflows already created. You should adit these to work for your connector. They include:
-
-* `test_macos`, `test_ubuntu`, `test_windows`: These run the unit tests, should not need to be altered
-* `test_integration`: These run the integration tests, you will need to provide a docker container to use and whatever installation steps are required for your case
-* `deploy`: Automates deployment to test-PyPI and PyPI for tagged releases (see below). You need to update the module names in this file - see the curly brackets.
-
-### Deployment
-When you are happy with your connector and are ready to deploy it to PyPI for the first time, you need to do the following:
-
-* Install `poetry` and `twine` if you haven't already: `pip install poetry twine`
-* Check your `pyproject.toml` file is valid by running `poetry check`
-* Install your module: `poetry install`
-* Build the distribution: `poetry build`
-* Go to `test.pypi.org`, create an account, and get a token
-* Upload your package with Twine: `twine upload -r testpypi dist/*`
-* Enter the token when prompted
-* Go to `https://test.pypi.org/project/{your-package-name}`, check it has been published
-* Click 'Manage Project'
-* If you wish to enable automatic deployments, click 'Publishing' -> 'Add a new publisher' and fill in the details for your repository, setting Workflow name to `deploy.yaml` and Environment name to `test_pypi`
-
-If this was all successful, repeat with the real PyPI instance at `pypi.org`, using `twine upload dist/*`, and setting the Environment name in the publisher settings to `pypi`.
-
-From now on, you can do deployments automatically. Simply:
-
-* Update the `pyproject.toml` with a new version number, eg `v1.0.1`
-* Update the CHANGELOG to reflect your newest changes
-* Tag a branch with a semantic version number, eg `git tag v1.0.1`
-* Push the tag: `git push origin v1.0.1`
-
-This should automatically start the deployment workflow - check that it completes successfully on the Github UI.
-
-### Updating the README
-When finished, delete all of the information above under the 'How to use this template' heading. Then update the information below to be relevant for your connector:
-
 ## Implementation
-{List here how your Connector works, and the things about the simulation it tracks by default.}
+A customised `OpenfoamRun` class has been created which automatically does the following:
+
+* Uploads the input files stored in the Constant and System directories, as well as the initial conditions in the 0 directory, as input artifacts
+* Uploads the Allrun script as a code artifact
+* Uploads information from the top of the log files, such as the OpenFOAM build used, as metadata
+* Uploads information from the log files before the solve begins to the events log
+* Tracks the residuals being calculated for each parameter as metrics
+* Once complete, uploads all of the outputs for each time step as output artifacts
+
+The `OpenfoamRun` class also inherits from the `Run()` class of the Simvue Python API, allowing for further detailed control over how your simulation is tracked.
 
 ## Installation
 To install and use this connector, first create a virtual environment:
@@ -96,7 +48,7 @@ source venv/bin/activate
 ```
 And then use pip to install this module:
 ```
-pip install {your_module_name_here}
+pip install simvue-openfoam
 ```
 
 ## Configuration
