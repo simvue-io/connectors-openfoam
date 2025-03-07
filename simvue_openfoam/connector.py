@@ -12,7 +12,6 @@ import zipfile
 import multiparser.parsing.tail as mp_tail_parser
 import pydantic
 import simvue
-
 from simvue_connector.connector import WrappedRun
 
 
