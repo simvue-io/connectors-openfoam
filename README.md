@@ -1,4 +1,4 @@
-# Simvue Connectors - Template
+# Simvue Connectors - OpenFoam
 
 <br/>
 
