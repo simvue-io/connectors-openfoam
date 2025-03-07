@@ -66,10 +66,9 @@ token = "..."
 The exact contents of both of the above options can be obtained directly by clicking the **Create new run** button on the web UI. Note that the environment variables have preference over the config file.
 
 ## Usage example
-{Replace the example below with a similar example exhibiting how to use your Connector. The example for the FDS (Fire Dynamics Simulator) connector is given below:}
 
 ```python
-from simvue_fds.connector import FDSRun
+from simvue_openfoam.connector import OpenfoamRun
 
 ...
 
@@ -79,22 +78,22 @@ if __name__ == "__main__":
 
     # Using a context manager means that the status will be set to completed automatically,
     # and also means that if the code exits with an exception this will be reported to Simvue
-    with FDSRun() as run:
+    with OpenfoamRun() as run:
 
         # Specify a run name, along with any other optional parameters:
         run.init(
-          name = 'my-fds-simulation',                                   # Run name
-          metadata = {'number_fires': 3},                               # Metadata
-          tags = ['fds', 'multiple-fires'],                             # Tags
-          description = 'FDS simulation of fires in a parking garage.', # Description
-          folder = '/fds/parking-garage/trial_1'                        # Folder path
+          name = 'my-openfoam-simulation',                              # Run name
+          metadata = {'angle_of_attack': 30},                           # Metadata
+          tags = ['fds', 'airfoil', '2D'],                              # Tags
+          description = 'OpenFOAM simulation of a 2D airfoil.',         # Description
+          folder = '/openfoam/airfoil2D/trial_1'                        # Folder path
         )
 
         # Set folder details if necessary
         run.set_folder_details(
-          metadata = {'simulation_type': 'parking_garage'},             # Metadata
-          tags = ['fds'],                                               # Tags
-          description = 'FDS simulations with fires in different areas' # Description
+          metadata = {'simulation_type': 'airfoil2D'},             # Metadata
+          tags = ['openfoam'],                                     # Tags
+          description = 'OpenFOAM simulations of airfoils'         # Description
         )
 
         # Can use the base Simvue Run() methods to upload extra information, eg:
@@ -102,22 +101,19 @@ if __name__ == "__main__":
 
         # Can add alerts specific to your simulation, eg:
         run.create_metric_threshold_alert(
-          name="visibility_below_five_metres",    # Name of Alert
-          metric="eye_level_visibility",          # Metric to monitor
+          name='ux_residuals_too_high',           # Name of Alert
+          metric='residuals.initial.Ux',          # Metric to monitor
           frequency=1,                            # Frequency to evaluate rule at (mins)
-          rule="is below",                        # Rule to alert on
-          threshold=5,                            # Threshold to alert on
+          rule="is above",                        # Rule to alert on
+          threshold=0.1,                          # Threshold to alert on
           notification='email',                   # Notification type
           trigger_abort=True                      # Abort simulation if triggered
         )
 
-        # Launch the FDS simulation
+        # Launch the OpenFOAM simulation
         run.launch(
-            fds_input_path='path/to/my/input_file.i',   # Path to your FDS input file
-            workdir_path='path/to/my/results_dir',      # Path where results should be created
-            run_in_parallel=True,                       # Whether to run in parallel using MPI
-            num_processors=2                            # Number of cores to use if in parallel
-
+            openfoam_case_dir='path/to/my/openfoam/case',   # Path to your OpenFOAM case directory
+            upload_as_zip=True,                              # Whether to upload inputs & results as zip files
             )
 
 ```
