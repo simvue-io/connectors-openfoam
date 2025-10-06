@@ -7,16 +7,13 @@ The OpenFOAM simulation used here simulates a the air flow around a 2D airfoil.
 
 To run this example with Docker:
     - Pull the OpenFOAM image: docker run -it ghcr.io/simvue-io/openfoam_example
-    - Clone this repository: git clone https://github.com/simvue-io/connectors-openfoam.git
-    - Move into OpenFOAM examples directory: cd connectors-openfoam/examples
     - Create a simvue.toml file, copying in your information from the Simvue server: nano simvue.toml
-    - Install Poetry: pip install poetry
-    - Install required modules: poetry install
-    - Run the example script: poetry run python openfoam_example.py
+    - Run the example script: python examples/openfoam_example.py
 
 To run this example on your own system with Openfoam installed:
     - Ensure that you have OpenFOAM installed on your system
-    - Move into OpenFOAM examples directory: cd connectors-openfoam/examples
+    - Clone this repository: git clone https://github.com/simvue-io/connectors-openfoam.git
+    - Move into OpenFOAM connector directory: cd connectors-openfoam
     - Create a simvue.toml file, copying in your information from the Simvue server: nano simvue.toml
     - Install Poetry: pip install poetry
     - Install required modules: poetry install

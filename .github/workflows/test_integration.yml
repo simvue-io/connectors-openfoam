@@ -24,12 +24,10 @@ jobs:
       - uses: aarcangeli/load-dotenv@v1
         with:
           path: ".github"
-      - name: Install Poetry
-        run: pip install poetry
-      - name: Install dependencies and run tests
+      - name: Run tests
         run: |
           export WM_PROJECT_DIR=/opt/openfoam10
           export SIMVUE_URL=${{ secrets.SIMVUE_URL }}
           export SIMVUE_TOKEN=${{ secrets.SIMVUE_TOKEN }}
-          poetry install --with dev
-          poetry run pytest tests/integration/
+          uv pip install pytest
+          uv run pytest tests/integration/
