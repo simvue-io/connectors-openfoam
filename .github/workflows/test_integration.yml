@@ -15,21 +15,21 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  IntegrationTests:
+  OpenFOAM:
     runs-on: ubuntu-latest
     container:
-      image: {your_base_image_here}
+      image: ghcr.io/simvue-io/openfoam_example
     steps:
       - uses: actions/checkout@v4
-      - name: Setup Python
-        uses: actions/setup-python@v5
+      - uses: aarcangeli/load-dotenv@v1
         with:
-          python-version: "3.11"
-      - name: Install poetry
-        run: python3 -m pip install poetry
+          path: ".github"
+      - name: Install Poetry
+        run: pip install poetry
       - name: Install dependencies and run tests
         run: |
+          export WM_PROJECT_DIR=/opt/openfoam10
           export SIMVUE_URL=${{ secrets.SIMVUE_URL }}
           export SIMVUE_TOKEN=${{ secrets.SIMVUE_TOKEN }}
-          poetry install --all-extras
-          poetry run pytest tests/integration
+          poetry install --with dev
+          poetry run pytest tests/integration/
