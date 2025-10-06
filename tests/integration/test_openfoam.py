@@ -1,4 +1,4 @@
-from examples.openfoam.openfoam_example import openfoam_example
+from examples.openfoam_example import openfoam_example
 import pytest
 import pathlib
 import tempfile
