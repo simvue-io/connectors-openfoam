@@ -9,6 +9,11 @@ import re
 import typing
 import zipfile
 
+try:
+    from typing import Self
+except ImportError:
+    from typing_extensions import Self
+
 import multiparser.parsing.tail as mp_tail_parser
 import pydantic
 import simvue
@@ -27,18 +32,12 @@ class OpenfoamRun(WrappedRun):
         run.launch(...)
     """
 
-    openfoam_case_dir: pydantic.DirectoryPath = None
-    upload_as_zip: bool = None
-    openfoam_env_vars: typing.Dict[str, typing.Any] = None
-
-    _metadata_uploaded: bool = None
-
     def _save_directory(
         self,
         dir_names: list[str],
         zip_name: str,
         file_type: typing.Literal["input", "output", "code"],
-    ):
+    ) -> None:
         """Save directories of files to the Simvue run.
 
         If upload_to_zip is True, will add files from all of the directories provided to a single archive Zip file,
@@ -97,7 +96,6 @@ class OpenfoamRun(WrappedRun):
             if not self._sv_obj._offline:
                 pathlib.Path(out_zip).unlink()
 
-    @mp_tail_parser.log_parser
     def _log_parser(
         self, file_content: str, **__
     ) -> tuple[dict[str, typing.Any], dict[str, typing.Any]]:
@@ -193,14 +191,59 @@ class OpenfoamRun(WrappedRun):
 
         return {}, metrics
 
-    def _pre_simulation(self):
+    def __init__(
+        self,
+        mode: typing.Literal["online", "offline", "disabled"] = "online",
+        abort_callback: typing.Optional[typing.Callable[[Self], None]] = None,
+        server_token: typing.Optional[str] = None,
+        server_url: typing.Optional[str] = None,
+        debug: bool = False,
+    ) -> None:
+        """Initialize the OpenfoamRun instance.
+
+        If `abort_callback` is provided the first argument must be this Run instance.
+
+        Parameters
+        ----------
+        mode : typing.Literal['online', 'offline', 'disabled'], optional
+            mode of running, by default 'online':
+                online - objects sent directly to Simvue server
+                offline - everything is written to disk for later dispatch
+                disabled - disable monitoring completelyby default "online"
+        abort_callback : typing.Optional[typing.Callable[[Self], None]], optional
+            callback executed when the run is aborted, by default None
+        server_token : typing.Optional[str], optional
+            overwrite value for server token, by default None
+        server_url : typing.Optional[str], optional
+            overwrite value for server URL, by default None
+        debug : bool, optional
+            run in debug mode, by default False
+
+        """
+        self.openfoam_case_dir: pathlib.Path | None = None
+        self.upload_as_zip: bool = True
+        self.openfoam_env_vars: dict = {}
+        self._metadata_uploaded: bool = False
+
+        super().__init__(
+            mode=mode,
+            abort_callback=abort_callback,
+            server_token=server_token,
+            server_url=server_url,
+            debug=debug,
+        )
+
+    def _pre_simulation(self) -> None:
         """Upload inputs from the system, constant and 0 directories, and adds the Openfoam process."""
         super()._pre_simulation()
 
         # Save the files in the System, Constant, and initial conditions ('0') directories
         self._save_directory(["system", "constant", "0"], "inputs.zip", "input")
 
-        # TODO: Any alerts I should define?
+        # Check an Allrun script exists
+        allrun_path = pathlib.Path(self.openfoam_case_dir).joinpath("Allrun")
+        if not allrun_path.exists():
+            raise FileNotFoundError("Allrun file not found in case directory!")
 
         # Add the Openfoam simulation as a process
         self.add_process(
@@ -211,16 +254,16 @@ class OpenfoamRun(WrappedRun):
             **self.openfoam_env_vars,
         )
 
-    def _during_simulation(self):
+    def _during_simulation(self) -> None:
         """Track any log files produced by Openfoam."""
         # Track all log files
         self.file_monitor.tail(
-            parser_func=self._log_parser,
+            parser_func=mp_tail_parser.log_parser(self._log_parser),
             path_glob_exprs=str(pathlib.Path(self.openfoam_case_dir).joinpath("log.*")),
             callback=lambda *_, **__: None,
         )
 
-    def _post_simulation(self):
+    def _post_simulation(self) -> None:
         """Upload all results found in the Openfoam case directory."""
         reg_exp = re.compile(r"([\d\.]+)")
         result_dirs = [
@@ -239,7 +282,7 @@ class OpenfoamRun(WrappedRun):
         openfoam_case_dir: pydantic.DirectoryPath,
         upload_as_zip: bool = True,
         openfoam_env_vars: typing.Optional[typing.Dict[str, typing.Any]] = None,
-    ):
+    ) -> None:
         """Command to launch the Openfoam simulation and track it with Simvue.
 
         Parameters
@@ -251,9 +294,43 @@ class OpenfoamRun(WrappedRun):
         openfoam_env_vars : typing.Optional[typing.Dict[str, typing.Any]], optional
             A dictionary of any environment variables to pass to the Openfoam simulation, by default None
 
+        Raises
+        ------
+        FileNotFoundError
+            Raised if no Allrun file is found in the case directory
+
         """
         self.openfoam_case_dir = openfoam_case_dir
         self.upload_as_zip = upload_as_zip
         self.openfoam_env_vars = openfoam_env_vars or {}
 
         super().launch()
+
+    def load(
+        self,
+        openfoam_case_dir: pydantic.DirectoryPath,
+        upload_as_zip: bool = True,
+    ):
+        """Command to load a set of Openfoam simulation results into Simvue.
+
+        Parameters
+        ----------
+        openfoam_case_dir : pydantic.DirectoryPath
+            The path to the directory containing the openfoam case
+        upload_as_zip : bool, optional
+            Whether to upload inputs and outputs as zip files, by default True
+        """
+        self.openfoam_case_dir = openfoam_case_dir
+        self.upload_as_zip = upload_as_zip
+
+        # Save the files in the System, Constant, and initial conditions ('0') directories
+        self._save_directory(["system", "constant", "0"], "inputs.zip", "input")
+
+        # Go through each log file and upload data from each
+        log_paths = list(pathlib.Path(self.openfoam_case_dir).rglob("log.*"))
+        for log_path in log_paths:
+            with open(log_path, "r") as log_file:
+                _, _log_data = self._log_parser(file_content=log_file.read())
+
+        # Save output directories
+        self._post_simulation()
