@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     | Website:  https://openfoam.org
-    \\  /    A nd           | Version:  10
+    \\  /    A nd           | Version:  13
      \\/     M anipulation  |
 \*---------------------------------------------------------------------------*/
 FoamFile
@@ -14,7 +14,7 @@ FoamFile
 }
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-application     pimpleFoam;
+solver          incompressibleFluid;
 
 startFrom       startTime;
 
@@ -22,7 +22,7 @@ startTime       0;
 
 stopAt          endTime;
 
-endTime         0.0034;
+endTime         0.003;
 
 deltaT          5e-06;
 
@@ -32,7 +32,7 @@ writeInterval   1e-4;
 
 purgeWrite      0;
 
-writeFormat     binary;
+writeFormat     ascii;
 
 writePrecision  6;
 
@@ -47,10 +47,5 @@ runTimeModifiable true;
 adjustTimeStep  yes;
 
 maxCo           0.5;
-
-functions
-{
-    #include "cuttingPlane"
-}
 
 // ************************************************************************* //

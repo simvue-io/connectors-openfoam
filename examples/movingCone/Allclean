@@ -1,11 +1,10 @@
 #!/bin/sh
 cd ${0%/*} || exit 1    # Run from this directory
 
-# Source tutorial clean functions
-. $WM_PROJECT_DIR/bin/tools/CleanFunctions
+# Clean time directories only
 
-rm -rf constant/meshToMesh*
-
-cleanCase
+rm -rf *[1-9]*
+rm -rf postProcessing*
+rm -f log.*
 
 #------------------------------------------------------------------------------
