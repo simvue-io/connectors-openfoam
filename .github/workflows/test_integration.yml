@@ -30,4 +30,4 @@ jobs:
           export SIMVUE_URL=${{ secrets.SIMVUE_URL }}
           export SIMVUE_TOKEN=${{ secrets.SIMVUE_TOKEN }}
           uv sync --all-extras
-          uv run pytest tests/integration/
+          uv run pytest tests/integration/ -n 4

@@ -17,10 +17,12 @@ RUN curl -LsSf https://astral.sh/uv/install.sh | sh
 
 RUN pip install uv
 
-RUN git clone https://github.com/simvue-io/connectors-openfoam
-WORKDIR /home/openfoam/connectors-openfoam
-RUN uv venv --python 3.11
-RUN uv pip install .
+WORKDIR /home/openfoam
+COPY . /home/openfoam/connectors-openfoam
+RUN uv venv --python 3.11 && \
+uv pip install ./connectors-openfoam && \
+rm -rf /home/openfoam/connectors-openfoam
+COPY ./examples /home/openfoam/examples
 
-ENV VIRTUAL_ENV=/home/openfoam/connectors-openfoam/.venv
+ENV VIRTUAL_ENV=/home/openfoam/.venv
 ENV PATH="$VIRTUAL_ENV/bin:$PATH"

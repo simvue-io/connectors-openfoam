@@ -41,11 +41,12 @@ repository = "https://github.com/simvue-io/connectors-openfoam"
 documentation = "https://docs.simvue.io"
 
 
-[project.optional-dependencies]
-dev = [
-  "pytest>=8.3.3,<9"
-]
-
 [build-system]
 requires = ["poetry-core>=2.0.0,<3.0.0"]
 build-backend = "poetry.core.masonry.api"
+
+[dependency-groups]
+dev = [
+    "pytest>=8.3.3,<9",
+    "pytest-xdist (>=3.8.0,<4.0.0)"
+]
