@@ -144,7 +144,7 @@ def test_openfoam_movingcone(offline_cache_setup, offline, load):
 
     # Check events uploaded from each log
     assert (
-        "[simpleFoam]: Create mesh for time = 0" in events
+        "[pimpleFoam]: Create mesh for time = 0" in events
         or "[foamRun]: Create mesh for time = 0" in events
     )
 
