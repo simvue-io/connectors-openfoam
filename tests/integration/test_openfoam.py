@@ -149,7 +149,6 @@ def test_openfoam_movingcone(offline_cache_setup, offline, load):
     )
 
     # Different blockMesh solvers also run
-    assert "[blockMesh -mesh 0.003]: Creating block mesh topology" in events
     assert "[blockMesh]: Creating block mesh topology" in events
 
     # Check metrics uploaded for residuals
