@@ -5,16 +5,32 @@
     \\  /    A nd           | Version:  10
      \\/     M anipulation  |
 \*---------------------------------------------------------------------------*/
-FoamFile
-{
-    format      ascii;
-    class       dictionary;
-    location    "constant";
-    object      momentumTransport;
-}
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-simulationType  laminar;
+cuttingPlane
+{
+    type            surfaces;
+    libs            ("libsampling.so");
+
+    writeControl    writeTime;
+
+    surfaceFormat   vtk;
+
+    fields          ( p U );
+
+    interpolationScheme cellPoint;
+
+    surfaces
+    (
+        zNormal
+        {
+            type            cuttingPlane;
+            planeType       pointAndNormal;
+            point           (0 0 0);
+            normal          (0 0 1);
+            interpolate     true;
+        }
+    );
+}
 
 
 // ************************************************************************* //
