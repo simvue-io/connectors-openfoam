@@ -24,7 +24,3 @@ RUN uv pip install .
 
 ENV VIRTUAL_ENV=/home/openfoam/connectors-openfoam/.venv
 ENV PATH="$VIRTUAL_ENV/bin:$PATH"
-
-RUN cp -r /opt/openfoam10/tutorials/incompressible/pimpleFoam/laminar/movingCone/ ./examples && \
-    cp -r /opt/openfoam10/tutorials/heatTransfer/buoyantFoam/hotRoom/ ./examples && \
-    cp -r /opt/openfoam10/tutorials/incompressible/simpleFoam/airFoil2D/ ./examples
