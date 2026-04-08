@@ -30,5 +30,7 @@ jobs:
           export SIMVUE_URL=${{ secrets.SIMVUE_URL }}
           export SIMVUE_TOKEN=${{ secrets.SIMVUE_TOKEN }}
 
-          uv pip install pytest --active
-          uv run --active python -m py
+          uv venv
+          source .venv/bin/activate
+          uv pip install pytest
+          pytest tests/integration
