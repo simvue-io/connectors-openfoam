@@ -22,7 +22,7 @@ COPY . /home/openfoam/connectors-openfoam
 RUN uv venv --python 3.11 && \
 uv pip install ./connectors-openfoam && \
 rm -rf /home/openfoam/connectors-openfoam
-COPY ./examples /home/openfoam/examples
+COPY ./examples /home/openfoam/
 
 ENV VIRTUAL_ENV=/home/openfoam/.venv
 ENV PATH="$VIRTUAL_ENV/bin:$PATH"
