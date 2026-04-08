@@ -29,5 +29,6 @@ jobs:
           export WM_PROJECT_DIR=/opt/openfoam10
           export SIMVUE_URL=${{ secrets.SIMVUE_URL }}
           export SIMVUE_TOKEN=${{ secrets.SIMVUE_TOKEN }}
-          uv pip install pytest
-          uv run python -m pytest tests/integration/
+
+          uv pip install pytest --active
+          uv run --active python -m py
