@@ -143,7 +143,10 @@ def test_openfoam_movingcone(offline_cache_setup, offline, load):
     assert run_data.metadata["openfoam"]["nprocs"] == "1"
 
     # Check events uploaded from each log
-    assert "[foamRun]: Create mesh for time = 0" in events
+    assert (
+        "[simpleFoam]: Create mesh for time = 0" in events
+        or "[foamRun]: Create mesh for time = 0" in events
+    )
 
     # Different blockMesh solvers also run
     assert "[blockMesh -mesh 0.003]: Creating block mesh topology" in events
