@@ -234,7 +234,14 @@ class OpenfoamRun(WrappedRun):
         )
 
     def _pre_simulation(self) -> None:
-        """Upload inputs from the system, constant and 0 directories, and adds the Openfoam process."""
+        """Upload inputs from the system, constant and 0 directories, and adds the Openfoam process.
+
+        Raises
+        ------
+        FileNotFoundError
+            Raised if no Allrun file is found in the case directory
+
+        """
         super()._pre_simulation()
 
         # Save the files in the System, Constant, and initial conditions ('0') directories
@@ -294,11 +301,6 @@ class OpenfoamRun(WrappedRun):
         openfoam_env_vars : typing.Optional[typing.Dict[str, typing.Any]], optional
             A dictionary of any environment variables to pass to the Openfoam simulation, by default None
 
-        Raises
-        ------
-        FileNotFoundError
-            Raised if no Allrun file is found in the case directory
-
         """
         self.openfoam_case_dir = openfoam_case_dir
         self.upload_as_zip = upload_as_zip
@@ -319,12 +321,18 @@ class OpenfoamRun(WrappedRun):
             The path to the directory containing the openfoam case
         upload_as_zip : bool, optional
             Whether to upload inputs and outputs as zip files, by default True
+
         """
         self.openfoam_case_dir = openfoam_case_dir
         self.upload_as_zip = upload_as_zip
 
         # Save the files in the System, Constant, and initial conditions ('0') directories
         self._save_directory(["system", "constant", "0"], "inputs.zip", "input")
+
+        # If Allrun file exists, upload as Code artifact
+        allrun_path = pathlib.Path(self.openfoam_case_dir).joinpath("Allrun")
+        if allrun_path.exists():
+            self.save_file(allrun_path, "code")
 
         # Go through each log file and upload data from each
         log_paths = list(pathlib.Path(self.openfoam_case_dir).rglob("log.*"))

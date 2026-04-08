@@ -60,12 +60,14 @@ def openfoam_example(run_folder, offline=False):
         )
 
         # Then call the .launch() method to start your OpenFOAM simulation, providing the path to the case directory which contains an Allrun file
+        # Optionally, disable 'upload as zip' to have all the files uploaded individually
         run.launch(
             openfoam_case_dir=pathlib.Path(__file__).parent.joinpath("movingCone"),
+            upload_as_zip=False,
         )
 
         # Once the simulation is complete, you can upload any final items to the Simvue run before it closes
-        run.log_event("Deleting local copies of results...")
+        run.save_file(pathlib.Path(__file__), "code")
 
         return run.id
 
