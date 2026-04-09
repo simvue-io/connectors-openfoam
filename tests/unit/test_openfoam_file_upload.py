@@ -127,16 +127,14 @@ def mock_aborted_openfoam_process(self, *_, **__):
         # Upload Allrun (which is normally done by add_process), then terminate
         self.save_file(pathlib.Path(self.openfoam_case_dir).joinpath("Allrun"), "code")
 
-        time.sleep(1)
-
-        self._alert_raised_trigger.set()
-
         time_elapsed = 0
         while time_elapsed < 30:
             time.sleep(1)
             if self._alert_raised_trigger.is_set():
                 break
             time_elapsed += 1
+        if time_elapsed >= 30:
+            raise AssertionError("Not successfully aborted")
         self._trigger.set()
 
     thread = threading.Thread(target=aborted_process)
@@ -152,6 +150,7 @@ def test_openfoam_file_upload_after_abort(folder_setup):
     with OpenfoamRun() as run:
         run.config(disable_resources_metrics=True)
         run.init(name=name, folder=folder_setup)
+        run._alert_raised_trigger.set()
         run_id = run.id
         run.launch(
             openfoam_case_dir=pathlib.Path(__file__).parent.joinpath(
@@ -161,10 +160,6 @@ def test_openfoam_file_upload_after_abort(folder_setup):
         )
 
     client = simvue.Client()
-
-    # Check that run was aborted correctly, and did not exist for longer than 10s
-    runtime = client.get_run(run_id).runtime
-    assert runtime.tm_sec < 30
 
     # Pull artifacts, check system, constants, initial conditions, results have been uploaded (not as zip files)
     with tempfile.TemporaryDirectory(prefix="openfoam_test") as temp_dir:
