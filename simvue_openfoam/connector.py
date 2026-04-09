@@ -12,7 +12,7 @@ import zipfile
 try:
     from typing import Self
 except ImportError:
-    from typing_extensions import Self
+    from typing_extensions import Self  # noqa: UP035
 
 import multiparser.parsing.tail as mp_tail_parser
 import pydantic
@@ -194,30 +194,35 @@ class OpenfoamRun(WrappedRun):
     def __init__(
         self,
         mode: typing.Literal["online", "offline", "disabled"] = "online",
-        abort_callback: typing.Optional[typing.Callable[[Self], None]] = None,
-        server_token: typing.Optional[str] = None,
-        server_url: typing.Optional[str] = None,
+        abort_callback: typing.Callable[[Self], None] | None = None,
+        server_token: str | None = None,
+        server_url: str | None = None,
         debug: bool = False,
+        server_profile: str | None = None,
     ) -> None:
         """Initialize the OpenfoamRun instance.
 
-        If `abort_callback` is provided the first argument must be this Run instance.
+        If `abort_callback` is provided the first argument must be this Run instance
 
         Parameters
         ----------
         mode : typing.Literal['online', 'offline', 'disabled'], optional
-            mode of running, by default 'online':
-                online - objects sent directly to Simvue server
-                offline - everything is written to disk for later dispatch
-                disabled - disable monitoring completelyby default "online"
-        abort_callback : typing.Optional[typing.Callable[[Self], None]], optional
-            callback executed when the run is aborted, by default None
-        server_token : typing.Optional[str], optional
-            overwrite value for server token, by default None
-        server_url : typing.Optional[str], optional
-            overwrite value for server URL, by default None
+            mode of running
+                * online - objects sent directly to Simvue server
+                * offline - everything is written to disk for later dispatch
+                * disabled - disable monitoring completely
+        abort_callback : typing.Callable[[Self], None] | None, optional
+            callback executed when the run is aborted
+        server_token : str | None, optional
+            overwrite value for server token, default is None
+        server_url : str | None, optional
+            overwrite value for server URL, default is None
         debug : bool, optional
-            run in debug mode, by default False
+            run in debug mode, default is False
+        server_profile : str | None, optional
+            specify alternative profile to use for server, this assumes
+            additional profiles have been specified in the configuration.
+            Default is to use the main server.
 
         """
         self.openfoam_case_dir: pathlib.Path | None = None
@@ -231,6 +236,7 @@ class OpenfoamRun(WrappedRun):
             server_token=server_token,
             server_url=server_url,
             debug=debug,
+            server_profile=server_profile,
         )
 
     def _pre_simulation(self) -> None:
@@ -288,7 +294,7 @@ class OpenfoamRun(WrappedRun):
         self,
         openfoam_case_dir: pydantic.DirectoryPath,
         upload_as_zip: bool = True,
-        openfoam_env_vars: typing.Optional[typing.Dict[str, typing.Any]] = None,
+        openfoam_env_vars: dict | None = None,
     ) -> None:
         """Command to launch the Openfoam simulation and track it with Simvue.
 
@@ -298,7 +304,7 @@ class OpenfoamRun(WrappedRun):
             The path to the directory containing the openfoam case (containing an Allrun file, and input directories)
         upload_as_zip : bool, optional
             Whether to upload inputs and outputs as zip files, by default True
-        openfoam_env_vars : typing.Optional[typing.Dict[str, typing.Any]], optional
+        openfoam_env_vars : dict | None, optional
             A dictionary of any environment variables to pass to the Openfoam simulation, by default None
 
         """
@@ -308,6 +314,8 @@ class OpenfoamRun(WrappedRun):
 
         super().launch()
 
+    @simvue.utilities.prettify_pydantic
+    @pydantic.validate_call
     def load(
         self,
         openfoam_case_dir: pydantic.DirectoryPath,
@@ -335,7 +343,7 @@ class OpenfoamRun(WrappedRun):
             self.save_file(allrun_path, "code")
 
         # Go through each log file and upload data from each
-        log_paths = list(pathlib.Path(self.openfoam_case_dir).rglob("log.*"))
+        log_paths = pathlib.Path(self.openfoam_case_dir).rglob("log.*")
         for log_path in log_paths:
             with open(log_path, "r") as log_file:
                 _, _log_data = self._log_parser(file_content=log_file.read())
