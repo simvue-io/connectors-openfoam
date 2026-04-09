@@ -127,6 +127,10 @@ def mock_aborted_openfoam_process(self, *_, **__):
         # Upload Allrun (which is normally done by add_process), then terminate
         self.save_file(pathlib.Path(self.openfoam_case_dir).joinpath("Allrun"), "code")
 
+        time.sleep(1)
+
+        self._alert_raised_trigger.set()
+
         time_elapsed = 0
         while time_elapsed < 30:
             time.sleep(1)
@@ -148,8 +152,6 @@ def test_openfoam_file_upload_after_abort(folder_setup):
     with OpenfoamRun() as run:
         run.config(disable_resources_metrics=True)
         run.init(name=name, folder=folder_setup)
-        run._heartbeat_interval = 2
-        run._alert_raised_trigger.set()
         run_id = run.id
         run.launch(
             openfoam_case_dir=pathlib.Path(__file__).parent.joinpath(
