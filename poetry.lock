@@ -1318,14 +1318,14 @@ plot = ["matplotlib (>=3.10.0,<4.0.0)", "plotly (>=6.0.0,<7.0.0)"]
 
 [[package]]
 name = "simvue-connector"
-version = "1.1.0"
+version = "1.1.1"
 description = "A generic class which all new Connectors (integrations which provide Simvue tracking for Non-Python software) should inherit from."
 optional = false
 python-versions = "<3.15,>=3.10"
 groups = ["main"]
 files = [
-    {file = "simvue_connector-1.1.0-py3-none-any.whl", hash = "sha256:de0ae8af7535ec47659417ef5cbf09871f2ce5442fc28ff66d27290f5483c6f3"},
-    {file = "simvue_connector-1.1.0.tar.gz", hash = "sha256:60b8a50763b15cdea84c40bfc6e9489935455dffecc9b0a22cf78412729f9377"},
+    {file = "simvue_connector-1.1.1-py3-none-any.whl", hash = "sha256:f94582da2aae345d80deefddf5bf9bf7c5a0d63bd7059d5eea36bf744ca915b8"},
+    {file = "simvue_connector-1.1.1.tar.gz", hash = "sha256:9d471820c0184489e3ccf74a6e9760249047124373792ce64b9ff5e1370096d5"},
 ]
 
 [package.dependencies]
@@ -1571,5 +1571,5 @@ dev = ["black (>=19.3b0) ; python_version >= \"3.6\"", "pytest (>=4.6.2)"]
 
 [metadata]
 lock-version = "2.1"
-python-versions = ">=3.10,<3.14"
-content-hash = "2ec20c2870d4eacf8004a82a7cb9b640c65dca8cd4c477627e9af6d184033902"
+python-versions = ">=3.10,<3.15"
+content-hash = "d0f0b58b8d567ebaa7df740853d2f3035948c8af6f28fdab652846d239c15eb8"

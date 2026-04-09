@@ -129,9 +129,9 @@ def mock_aborted_openfoam_process(self, *_, **__):
 
         time_elapsed = 0
         while time_elapsed < 30:
+            time.sleep(1)
             if self._alert_raised_trigger.is_set():
                 break
-            time.sleep(1)
             time_elapsed += 1
         self._trigger.set()
 
@@ -149,8 +149,7 @@ def test_openfoam_file_upload_after_abort(folder_setup):
         run.config(disable_resources_metrics=True)
         run.init(name=name, folder=folder_setup)
         run._heartbeat_interval = 2
-        run.create_user_alert("openfoam_test_abort", trigger_abort=True)
-        run.log_alert(name="openfoam_test_abort", state="critical")
+        run._alert_raised_trigger.set()
         run_id = run.id
         run.launch(
             openfoam_case_dir=pathlib.Path(__file__).parent.joinpath(
