@@ -1,0 +1,97 @@
+/*---------------------------------------------------------------------------*\
+  =========                 |
+  \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
+   \\    /   O peration     | Website:  https://openfoam.org
+    \\  /    A nd           | Version:  13
+     \\/     M anipulation  |
+\*---------------------------------------------------------------------------*/
+Build  : 13-58ed5c2046ef
+Exec   : blockMesh -mesh 0.003
+Date   : Apr 07 2026
+Time   : 16:55:01
+Host   : "P0243"
+PID    : 939235
+I/O    : uncollated
+Case   : /home/wk9874/Documents/simvue/connectors-openfoam/tests/integration/example_data/load/movingCone
+nProcs : 1
+sigFpe : Enabling floating point exception trapping (FOAM_SIGFPE).
+fileModificationChecking : Monitoring run-time modified files using timeStampMaster (fileModificationSkew 10)
+allowSystemOperations : Allowing user-supplied system call operations
+
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+Create time
+
+
+Generating mesh meshes/0.003
+Reading "blockMeshDict"
+
+Creating block mesh from
+    "system/meshes/0.003/blockMeshDict"
+No non-linear block edges defined
+No non-planar block faces defined
+Creating topology blocks
+Creating topology patches
+
+Creating block mesh topology
+
+Basic statistics
+    Number of internal faces : 4
+    Number of boundary faces : 22
+    Number of defined boundary faces : 22
+    Number of undefined boundary faces : 0
+
+Checking topology
+Creating block offsets
+Creating merge list .
+
+Creating polyMesh from blockMesh
+Creating patches
+Creating cells
+Creating points with scale 0.001
+    Block 0 cell size :
+        i : 0.00014
+        j : 5.00475e-05 .. 5.00475e-05
+        k : 0 0 4.36194e-06 4.36194e-06 
+    Block 1 cell size :
+        i : 6.86322e-05 .. 0.000137264
+        j : 0.000183513 .. 4.58783e-05
+        k : 0 0 1.59943e-05 1.59943e-05 
+    Block 2 cell size :
+        i : 0.00014
+        j : 0.000116778
+        k : 6.54291e-05 6.54291e-05 7.56069e-05 7.56069e-05 
+    Block 3 cell size :
+        i : 7.43383e-05 .. 7.43383e-05 7.37935e-05 .. 7.37935e-05 7.43383e-05 .. 7.43383e-05 7.37935e-05 .. 7.37935e-05 
+        j : 0.000116778 0.000115109 .. 0.000115109 0.000116778 0.000115109 .. 0.000115109 
+        k : 6.54291e-05 6.761e-05 7.56069e-05 7.76425e-05 
+    Block 4 cell size :
+        i : 6.86322e-05 .. 0.000137264
+        j : 3.3365e-05 .. 3.3365e-05
+        k : 0.000174478 0.000174478 0.000177386 0.000177386 
+
+No patch pairs to merge
+
+Writing polyMesh
+----------------
+Mesh Information
+----------------
+  boundingBox: (-0.0075 0 -0.000109048) (0 0.0025 0.000109048)
+  nPoints: 3580
+  nCells: 1675
+  nFaces: 6800
+  nInternalFaces: 3220
+----------------
+Patches
+----------------
+  patch 0 (start: 3220 size: 0) name: internal
+  patch 1 (start: 3220 size: 85) name: movingWall
+  patch 2 (start: 3305 size: 50) name: farFieldMoving
+  patch 3 (start: 3355 size: 35) name: fixedWall
+  patch 4 (start: 3390 size: 0) name: axis
+  patch 5 (start: 3390 size: 30) name: left
+  patch 6 (start: 3420 size: 30) name: farField
+  patch 7 (start: 3450 size: 1675) name: back
+  patch 8 (start: 5125 size: 1675) name: front
+
+End
+

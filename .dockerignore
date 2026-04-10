@@ -1,0 +1,5 @@
+*
+!simvue_openfoam/
+!examples/
+!pyproject.toml
+!README.md
